@@ -4,6 +4,9 @@ module PureCDB
   # Base class with shared functionality for PureCDB::Reader and
   # PureCDB::Writer that abstracts away 32 bit vs. 64 bit format
   # details. You should not need to use this directly.
+  #
+  # Changing the constants defined here is likely to break all
+  # kinds of stuff.
   # 
   class Base
     # The CDB format contains 256 separate hashes by default.
