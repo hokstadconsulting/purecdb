@@ -1,8 +1,8 @@
 module PureCDB
   class Writer < Base
-    # This just needs to be <= 1. The lower it is, the fewer records will collide. The closer to 1 it is,                                                  
-    # the more frequently the reader may have to engage in potentially lengthy (worst case scanning all the                                                
-    # records) probing to find the right entry                                                                                                             
+    # This just needs to be <= 1. The lower it is, the fewer records will collide. The closer to 1 it is,
+    # the more frequently the reader may have to engage in potentially lengthy (worst case scanning all the
+    # records) probing to find the right entry
     def hash_fill_factor
       0.7
     end
@@ -40,15 +40,14 @@ module PureCDB
       @io.close if @io.respond_to?(:close)
     end
    
-   # For compatibility w/cdb / CDBMaker                                                                                                                    
+   # For compatibility w/cdb / CDBMaker
    def store key,value
      add key,value
    end
 
    def add key,value
-     # In an attempt to save memory, we pack the hash data we gather into                                                                                 
-     # strings of BER compressed integers...                                                                                                              
-     
+     # In an attempt to save memory, we pack the hash data we gather into
+     # strings of BER compressed integers...     
      h = hash(key)
      hi = (h % num_hashes)
      @hashes[hi] ||= ""
@@ -56,8 +55,7 @@ module PureCDB
      header = build_header(key.length, value.length)
      @io.syswrite(header+key+value)
      size = header.size + key.size + value.size
-     @hashes[hi] += [h,@pos].pack("ww") # BER compressed                                                                                                  
-     
+     @hashes[hi] += [h,@pos].pack("ww") # BER compressed     
      @pos += size
    end
 
@@ -88,7 +86,7 @@ module PureCDB
             while ary[off*2] != 0
               off = (off + 1) % len
             end
-        free_slots -= 1
+            free_slots -= 1
             ary[off*2] = entry[0]
             ary[off*2+1] = entry[1]
           end
