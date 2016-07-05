@@ -41,7 +41,6 @@ module PureCDB
         raise "#{mode}bit mode detected in file; options request #{@mode}bit mode"
       end
 
-      # FIXME: It seems like there are bugs triggered if mmap fails                       
       @m = Mmap.new(target,"r", Mmap::MAP_SHARED) rescue nil
       read_hashes
 
@@ -61,6 +60,9 @@ module PureCDB
       Reader.new(target, *options, &block)
     end
 
+    #
+    # Close the CDB file
+    #
     def close
       @io.close if @io
       @m.unmap if @m
@@ -68,6 +70,11 @@ module PureCDB
       @io = nil
     end
 
+    # Iterate over all key/value pairs in the order they occur in the file.
+    # This is *not* sorted or insertion order.
+    #
+    # +each+ will yield each key,value pair separately even when a key is
+    # duplicate.
     def each
       pos = hash_size
       hoff0 = @hashes[0]
@@ -78,16 +85,7 @@ module PureCDB
       end
     end
 
-    def read_entry(pos)
-      keylen, datalen = read_header(pos)
-      return nil,nil if !keylen
-      pos += hashref_size
-      rkey = read(pos .. pos + keylen - 1)
-      pos += keylen
-      value = read(pos .. pos + datalen - 1)
-      return rkey, value
-    end
-
+    # Returns all values for +key+ in an array
     def values(key)
       h = hash(key)
 
@@ -120,6 +118,17 @@ module PureCDB
     end
 
     private
+
+    def read_entry(pos)
+      keylen, datalen = read_header(pos)
+      return nil,nil if !keylen
+      pos += hashref_size
+      rkey = read(pos .. pos + keylen - 1)
+      pos += keylen
+      value = read(pos .. pos + datalen - 1)
+      return rkey, value
+    end
+
 
     # Warning: This will be very slow if not mmap'd
     def read r
