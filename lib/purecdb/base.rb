@@ -53,12 +53,15 @@ module PureCDB
     def set_mode mode
       @mode = mode
       @num_hashes = DEFAULT_NUM_HASHES
+
       if @mode == 64
         @length_size  = DEFAULT_LENGTH_SIZE  * 2
         @hashptr_size = DEFAULT_HASHPTR_SIZE * 2
+        @format = "Q<"
       else
         @length_size  = DEFAULT_LENGTH_SIZE
         @hashptr_size = DEFAULT_HASHPTR_SIZE
+        @format = "V"
       end
     end
 
@@ -73,9 +76,6 @@ module PureCDB
           mode = val
         end
       end
-
-      # Used to speed up 64bit pack/unpack
-      @little_endian = [123456789].pack("L") == [123456789].pack("V")
 
       if mode == :detect
         @mode = :detect
@@ -112,29 +112,12 @@ module PureCDB
 
     private
 
-    # Due to Array#pack's lack of a little/big endian specific 64 bit operator
     def ary_pack(ary)
-      if @mode == 32
-        ary.pack("V*")
-      elsif @little_endian
-        ary.pack("Q*")
-      else
-        ary.collect {|a| [a & 0xffffffff, (a >> 32) & 0xffffffff] }.flatten.pack("V*")
-      end
+      ary.pack("#{@format}*")
     end
 
-    # Due to String#unpack's lack of a little/big endian specific 64 bit operator
     def ary_unpack(data, num)
-      if @mode == 32
-        data.unpack("V#{num}")
-      elsif @little_endian
-        data.unpack("Q#{num}")
-      else
-        ret = []
-        data = data.unpack("V#{num*2}")
-        data.each_slice(2) {|a| ret << (a[0] + (a[1] << 32)) }
-        ret
-      end
+      data.unpack("#{@format}#{num}")
     end
   end
 
