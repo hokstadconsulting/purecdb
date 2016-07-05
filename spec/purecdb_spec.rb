@@ -28,7 +28,7 @@ describe PureCDB do
   end
 
   def check_pairs_individually
-    r = PureCDB::Reader.open(StringIO.new(strio.string))
+    r = PureCDB.reader(StringIO.new(strio.string))
     pairs.each do |pair|
       # This presupposes no multi-value keys
       expect(r.values(pair[0])).to eq([pair[1]])
@@ -147,7 +147,6 @@ describe PureCDB do
 
       c = r.collect.sort_by{|a| a.first}
       ps = pairs2.sort_by{|a| a.first}
-      p [c,ps]
       expect(c).to eq(ps)
     end
 
