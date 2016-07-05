@@ -40,12 +40,7 @@ module PureCDB
       @io.close if @io.respond_to?(:close)
     end
    
-   # For compatibility w/cdb / CDBMaker
    def store key,value
-     add key,value
-   end
-
-   def add key,value
      # In an attempt to save memory, we pack the hash data we gather into
      # strings of BER compressed integers...     
      h = hash(key)

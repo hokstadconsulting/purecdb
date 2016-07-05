@@ -36,7 +36,7 @@ describe PureCDB do
   end
 
   def create_cdb_with_pairs *options
-    create_cdb(*options) {|f| pairs.each { |pair| f.add(*pair) } }
+    create_cdb(*options) {|f| pairs.each { |pair| f.store(*pair) } }
   end
 
 
@@ -128,7 +128,7 @@ describe PureCDB do
     specify "When creating a CDB with duplicate keys, '#values' should include all values for the key" do
       pairs2 = pairs.dup
       pairs2 << ["foo", "bar3"]
-      create_cdb { |f| pairs2.each { |pair| f.add(*pair) } }
+      create_cdb { |f| pairs2.each { |pair| f.store(*pair) } }
 
       r = PureCDB::Reader.open(StringIO.new(strio.string))
       pairs2res = pairs2.group_by{|a| a.first }.collect{|k,v| [k,v.collect{|a| a.last}]}
@@ -141,7 +141,7 @@ describe PureCDB do
     specify "When creating a CDB with duplicate keys, '#collect' should return each pair separately" do
       pairs2 = pairs.dup
       pairs2 << ["foo", "bar3"]
-      create_cdb { |f| pairs2.each { |pair| f.add(*pair) } }
+      create_cdb { |f| pairs2.each { |pair| f.store(*pair) } }
 
       r = PureCDB::Reader.open(StringIO.new(strio.string))
 
