@@ -1,7 +1,7 @@
 module PureCDB
 
   #
-  # Read 32 bit or 54 bit CDB file CDB files.
+  # Read 32 bit or 64 bit CDB files.
   # 
   class Reader < Base
     include Enumerable
@@ -54,7 +54,7 @@ module PureCDB
     end
 
     #
-    # Shortcut for PureCDB::Reader.new(target,options) .. 
+    # Alternative to PureCDB::Reader.new(target,options) ..
     #
     def self.open(target, *options, &block)
       Reader.new(target, *options, &block)
