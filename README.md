@@ -45,7 +45,7 @@ To create a 32 bit (standard) CDB file:
 To instead create a 64 bit file, pass {mode: 64} as the second argument to PureCDB::Writer#open .
 
 
-To read a 32 bit (standard) CDB file:
+To read a CDB file (auto-detecting standard 32-bit or extended 64-bit) CDB files:
 
 ```ruby
     PureCDB::Reader.open("/tmp/somecdbfile.cdb") do |r|
@@ -53,8 +53,8 @@ To read a 32 bit (standard) CDB file:
     end
 ```
 
-To instead create a 64 bit file, pass {mode: 64} as the second argument to PureCDB::Reader#open,
-or let the reader auto-detect the format.
+To require a 32 or 64 bit file specifically, pass {mode: 32} or {mode: 64} as
+the second argument to PureCDB::Reader#open.
 
 See PureCDB::Reader#new for additional usage.
 
