@@ -14,7 +14,7 @@ describe PureCDB do
      ["foo2","bar2"]
     ]
   }
-  
+
   def create_cdb(*options)
     PureCDB::Writer.open(strio,*options) do |f|
       yield f if block_given?
@@ -124,6 +124,33 @@ describe PureCDB do
       create_cdb_with_pairs(:mode => 32)
       check_pairs_individually
     end
+
+    specify "When creating a CDB with duplicate keys, '#values' should include all values for the key" do
+      pairs2 = pairs.dup
+      pairs2 << ["foo", "bar3"]
+      create_cdb { |f| pairs2.each { |pair| f.add(*pair) } }
+
+      r = PureCDB::Reader.open(StringIO.new(strio.string))
+      pairs2res = pairs2.group_by{|a| a.first }.collect{|k,v| [k,v.collect{|a| a.last}]}
+
+      pairs2res.each do |k,v|
+        expect(r.values(k)).to eq(v)
+      end
+    end
+
+    specify "When creating a CDB with duplicate keys, '#collect' should return each pair separately" do
+      pairs2 = pairs.dup
+      pairs2 << ["foo", "bar3"]
+      create_cdb { |f| pairs2.each { |pair| f.add(*pair) } }
+
+      r = PureCDB::Reader.open(StringIO.new(strio.string))
+
+      c = r.collect.sort_by{|a| a.first}
+      ps = pairs2.sort_by{|a| a.first}
+      p [c,ps]
+      expect(c).to eq(ps)
+    end
+
 
     specify "When creating a CDB64 of more than 4GB, all the values should be found when looking them up" do
       pending
