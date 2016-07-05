@@ -17,9 +17,6 @@ module PureCDB
     # 64 bit format this is multiplied by 2.
     DEFAULT_HASHPTR_SIZE = 4
 
-    # Number of bytes that will be buffered
-    BUFFER_SIZE = 4096
-
     # Magic cookied used to indicate that this is a 64 bit (non-standard) CDB file
     # rather than a 32-bit CDB file.
     CDB64_MAGIC = "cdb64:01"
