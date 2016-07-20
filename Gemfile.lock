@@ -1,12 +1,16 @@
 PATH
   remote: .
   specs:
-    purecdb (0.1.0)
+    purecdb (1.1.0)
+      ffi-mmap
 
 GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.2.5)
+    ffi (1.9.14)
+    ffi-mmap (0.2.0)
+      ffi
     json (1.8.3)
     rake (10.4.2)
     rdoc (4.2.2)
@@ -34,3 +38,6 @@ DEPENDENCIES
   rake (~> 10.0)
   rdoc
   rspec
+
+BUNDLED WITH
+   1.12.5

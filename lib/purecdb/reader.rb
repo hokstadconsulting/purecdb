@@ -1,3 +1,8 @@
+begin
+    require 'ffi/mmap'
+rescue LoadError
+end
+
 module PureCDB
 
   #
@@ -15,10 +20,11 @@ module PureCDB
     #   PureCDB::Reader.new(file, options) {|r| ... }
     #
     # +file+ can be a String or any object that meets the minimum
-    # requirements, which means having  #sysseek, #sysopen to and #sysclos
+    # requirements, which means having  #sysseek, #sysopen to and #sysclose
     # which does not arbitrarily sttop access ot it.
     #
-    # If Mmap is available, the code will attempt to use it.
+    # If Mmap is available, the code will attempt to use it if target is a
+    # filename
     # 
     def initialize target, *options
       if target.is_a?(String)
@@ -41,7 +47,7 @@ module PureCDB
         raise "#{mode}bit mode detected in file; options request #{@mode}bit mode"
       end
 
-      @m = Mmap.new(target,"r", Mmap::MAP_SHARED) rescue nil
+      @m = FFI::Mmap.new(target,"r", FFI::Mmap::MAP_SHARED) rescue nil
       read_hashes
 
       raise "Invalid File (Hashes are all empty)" if @hashes.uniq == [0]
@@ -51,6 +57,18 @@ module PureCDB
         close
       else
       end
+    end
+
+    #
+    # Is the file mmap'ed? Note that this may in theory return true right after
+    # opening the file, but return false after attempting to read if the 
+    # attempt to read from the mmap object fails for whatever reason. 
+    #
+    # I'm not sure that can ever happen, but to be 100% sure, check *after* a
+    # lookup
+    #
+    def mmap?
+       @m.nil? == false
     end
 
     #
@@ -132,7 +150,6 @@ module PureCDB
 
     # Warning: This will be very slow if not mmap'd
     def read r
-      @m = nil
       if @m
         res = @m[r]
         return res if res

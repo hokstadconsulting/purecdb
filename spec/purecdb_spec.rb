@@ -77,7 +77,20 @@ describe PureCDB do
         expect(r.values(k)).to eq([v])
       end
     end
+
+    specify "will use FFI::Mmap when passed a filename if possible" do
+      f = create_cdb_other(pairs)
+      r = PureCDB::Reader.open(f)
+      expect(r.mmap?).to be true
+      pairs.each do |k,v|
+        expect(r.values(k)).to eq([v])
+      end
+      # Mmap will be switched off during read if it fails, so check again
+      # after reading back the key/values
+      expect(r.mmap?).to be true
+    end
   end
+
 
   describe PureCDB::Writer do
 
