@@ -83,7 +83,7 @@ module PureCDB
     #
     def close
       @io.close if @io
-      @m.unmap if @m
+      @m.munmap if @m
       @m = nil
       @io = nil
     end
