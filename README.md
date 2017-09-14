@@ -38,7 +38,7 @@ To create a 32 bit (standard) CDB file:
 
 ```ruby
     PureCDB::Writer.open("/tmp/somecdbfile.cdb") do |cdb| 
-     cdb.add("key","value")
+     cdb.store("key","value")
     end
 ```
 
