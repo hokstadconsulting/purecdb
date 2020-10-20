@@ -55,10 +55,16 @@ module PureCDB
 
       set_mode(32) if @mode == :detect
 
-      if target.is_a?(String)
-        @io = File.new(target,"wb")
-      else
+      pathname = self.class.const_defined?(:Pathname) ? Pathname : String
+      case target
+      when String, pathname
+        @name = target
+        @io = File.new(target,"rb")
+        raise "Unable to open file #{target}" if !@io
+      when IO, StringIO
         set_stream(target)
+      else
+        raise ArgumentError, "#{target} should be String, Pathname"
       end
 
       @hashes = [nil] * num_hashes
