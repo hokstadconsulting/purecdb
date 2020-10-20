@@ -27,14 +27,18 @@ module PureCDB
     # filename
     # 
     def initialize target, *options
-      if target.is_a?(String)
+      pathname = self.class.const_defined?(:Pathname) ? Pathname : String
+      case target
+      when String, pathname
         @name = target
         @io = File.new(target,"rb")
         raise "Unable to open file #{target}" if !@io
-      else
+      when IO, StringIO
         set_stream(target)
+      else
+        raise ArgumentError, "#{target} should be String, Pathname, IO"
       end
-      
+
       @io.sysseek(-8,IO::SEEK_END)
       tail = @io.sysread(8)
       raise "Unable to read trailing 8 bytes for magic cookie" if tail.size != 8
