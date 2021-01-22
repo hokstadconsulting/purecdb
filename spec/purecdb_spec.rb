@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'pathname'
 
 describe PureCDB do
   let(:strio) { StringIO.new }
@@ -81,6 +82,19 @@ describe PureCDB do
     specify "will use FFI::Mmap when passed a filename if possible" do
       f = create_cdb_other(pairs)
       r = PureCDB::Reader.open(f)
+      expect(r.mmap?).to be true
+      pairs.each do |k,v|
+        expect(r.values(k)).to eq([v])
+      end
+      # Mmap will be switched off during read if it fails, so check again
+      # after reading back the key/values
+      expect(r.mmap?).to be true
+    end
+
+    specify "PureCDB::Reader.open(pathname)" do
+      create_cdb_other(pairs)
+      pathname = Pathname.new("/tmp/test.cdb")
+      r = PureCDB::Reader.open(pathname)
       expect(r.mmap?).to be true
       pairs.each do |k,v|
         expect(r.values(k)).to eq([v])
